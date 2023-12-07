@@ -1,4 +1,6 @@
 import { BaseClient } from "@lark-base-open/node-sdk";
+import { fetchAllFieldsFromTableA } from './fetchTableFields';
+import { Field, ResponseData, getFieldType } from './fieldType';
 
 const APP_TOKEN = process.env["APP_TOKEN"];
 const PERSONAL_BASE_TOKEN = process.env["PERSONAL_BASE_TOKEN"];
@@ -76,17 +78,49 @@ export async function sync(from: string, to: string) {
     });
 
 
+  //获取A表所有字段
+
+  try {
+      const fields = await fetchAllFieldsFromTableA(table_a_id);
+      //console.log('获取到的字段列表:', fields);
+
+    const responseData: ResponseData = {
+        items: fields,
+    };
+    const type = getFieldType(fieldName, responseData);
+  } catch (error) {
+      console.error('发生错误:', error);
+  }
+
+
+
+  //获取B表所有字段
+  // const resB = await client.base.appTableField.list({
+  //     params: {
+  //       page_size: 100,
+  //     },
+  //     path: {
+  //         table_id: table_b_id,
+  //     },
+  // });
+  //校验AB表基准字段
+  //校验AB表同步字段
+
+
+
     let standard: string[] = table_ab.map(row => row.table_a);
     let sync: string[] = table_snyc.map(row => row.table_a);
     let combined: string[] = [...standard, ...sync];
 
-    console.log(`A表基准字段： ${standard}；A表同步字段： ${sync}；`);
+    // console.log(`A表基准字段： ${standard}；A表同步字段： ${sync}；`);
+    console.log('>>> A表基准字段：', JSON.stringify(standard));
+    console.log('>>> A表同步字段：', JSON.stringify(sync));
 
     while (has_more) {
         const res = await client.base.appTableRecord.list({
             params: {
                 page_size: 400,
-                field_names: combined,
+                field_names: JSON.stringify(combined),
                 page_token: page_token,
             },
             path: {
@@ -114,9 +148,9 @@ export async function sync(from: string, to: string) {
         page_token = res.data.page_token;
 
     }
-    console.log('>>> A表检索shi', JSON.stringify(itemList[0]));
-    console.log('检索完A表');
-  
+    console.log('>>> A表检索数据例子', JSON.stringify(itemList[0]));
+    console.log('A表检索完成');
+
 
 
     while (has_more2) {
