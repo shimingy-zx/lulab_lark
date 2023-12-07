@@ -8,12 +8,12 @@ const TABLEID = process.env["TABLE_ID"];
 
 
 let table_a_id = "tblofVnOtmB3bkNz";
-let table_b_id= "tblX4oyTPrF5UwAv";
+let table_b_id = "tblX4oyTPrF5UwAv";
 
 //基准字段
 type Row = {
-  table_a: string;
-  table_b: string;
+    table_a: string;
+    table_b: string;
 };
 
 let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
@@ -21,11 +21,11 @@ let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
 
 //同步字段
 type Sync = {
-  table_a: string;
-  table_b: string;
+    table_a: string;
+    table_b: string;
 };
 
-let table_snyc: Sync[] = [{ table_a: "手机号码", table_b: "phone" },{ table_a: "wechat", table_b: "wechat" }];
+let table_snyc: Sync[] = [{ table_a: "手机号码", table_b: "phone" }, { table_a: "wechat", table_b: "wechat" }];
 
 
 
@@ -78,33 +78,33 @@ export async function sync(from: string, to: string) {
     });
 
 
-  //获取A表所有字段
+    //获取A表所有字段
 
-  try {
-      const fields = await fetchAllFieldsFromTableA(table_a_id);
-      //console.log('获取到的字段列表:', fields);
+    try {
+        const fields = await fetchAllFieldsFromTableA(table_a_id);
+        //console.log('获取到的字段列表:', fields);
 
-    const responseData: ResponseData = {
-        items: fields,
-    };
-    const type = getFieldType(fieldName, responseData);
-  } catch (error) {
-      console.error('发生错误:', error);
-  }
+        const responseData: ResponseData = {
+            items: fields,
+        };
+        const type = getFieldType(fieldName, responseData);
+    } catch (error) {
+        console.error('发生错误:', error);
+    }
 
 
 
-  //获取B表所有字段
-  // const resB = await client.base.appTableField.list({
-  //     params: {
-  //       page_size: 100,
-  //     },
-  //     path: {
-  //         table_id: table_b_id,
-  //     },
-  // });
-  //校验AB表基准字段
-  //校验AB表同步字段
+    //获取B表所有字段
+    // const resB = await client.base.appTableField.list({
+    //     params: {
+    //       page_size: 100,
+    //     },
+    //     path: {
+    //         table_id: table_b_id,
+    //     },
+    // });
+    //校验AB表基准字段
+    //校验AB表同步字段
 
 
 
@@ -140,7 +140,7 @@ export async function sync(from: string, to: string) {
                 continue;
 
             }
-          itemList = itemList.concat(customer);
+            itemList = itemList.concat(customer);
 
         }
 
