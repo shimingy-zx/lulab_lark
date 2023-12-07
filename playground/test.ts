@@ -11,33 +11,21 @@ export async function test(from: string, to: string) {
     personalBaseToken: PERSONAL_BASE_TOKEN,
   });
 
+  //基准字段
+  type Row = {
+      table_a: string;
+      table_b: string;
+  };
+
+  let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
+  let standard_a: string[] = table_ab.map(row => row.table_a);
 
 
 
 
-  await client.base.appTableRecord.batchUpdate({
-    path: {
-      table_id: "tblX4oyTPrF5UwAv",
-    },
-    data: {
-        records: [
-            {
-                record_id: "rec5K3ReVK",
-                fields: {
-                    姓名_en: "test1234",
-                    phone: "13700292882"
-                }
-            },
-            {
-                record_id: "recjpFi3hl",
-                fields: {
-                    姓名_en: "test1234",
-                    phone: "13398756005"
-                }
-            }
-        ]
-    }
-  });
+
+
+
 
 
 
