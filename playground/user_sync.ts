@@ -80,7 +80,7 @@ export async function sync(from: string, to: string) {
     let sync: string[] = table_snyc.map(row => row.table_a);
     let combined: string[] = [...standard, ...sync];
 
-    console.log('A表检索字段'${combined});
+    console.log(`A表基准字段： ${standard}；A表同步字段： ${sync}；`);
 
     while (has_more) {
         const res = await client.base.appTableRecord.list({
