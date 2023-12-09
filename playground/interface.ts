@@ -12,4 +12,16 @@ export interface Item {
     record_id: string;
 }
 
+export interface Item_add {
+    fields: Fields;
+}
+
 export type ItemList = Item[];
+
+export type ItemList_b = Item_add[];
+
+
+export type Row = {
+    table_a: string;
+    table_b: string;
+};

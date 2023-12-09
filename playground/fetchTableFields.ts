@@ -27,36 +27,45 @@ interface ApiResponse {
 }
 
 async function fetchAllFieldsFromTableA(table_a_id: string): Promise<FieldItem[]> {
-
-
-
   const client = new BaseClient({
-      appToken: APP_TOKEN,
-      personalBaseToken: PERSONAL_BASE_TOKEN,
+    appToken: APP_TOKEN,
+    personalBaseToken: PERSONAL_BASE_TOKEN,
   });
 
-  
   let page_token = null;
   let has_more = true;
   let itemList: FieldItem[] = [];
 
   while (has_more) {
-    const resA: ApiResponse = await client.base.appTableField.list({
-      params: {
-        page_size: 100,
-        page_token: page_token // 使用page_token获取下一页数据
-      },
-      path: {
-        table_id: table_a_id,
-      },
-    });
+    try {
+      const resA: ApiResponse = await client.base.appTableField.list({
+        params: {
+          page_size: 100,
+          page_token: page_token // 使用page_token获取下一页数据
+        },
+        path: {
+          table_id: table_a_id,
+        },
+      });
 
-    //console.log('>>> 获取A表所有字段：', JSON.stringify(resA));
+      // 合并当前页的项目到itemList
+      itemList = itemList.concat(resA.data.items);
+      has_more = resA.data.has_more;
+      page_token = resA.data.page_token;
 
-    // 合并当前页的项目到itemList
-    itemList = itemList.concat(resA.data.items);
-    has_more = resA.data.has_more;
-    page_token = resA.data.page_token;
+      
+    } catch (error) {
+      console.log('+++++错误===================');
+      if (error.response && error.response.status === 429) {
+        // 当遇到429错误时等待
+        // const waitTime = error.response.headers['x-ogw-ratelimit-reset'] || 60;
+        // console.log(`Rate limit reached. Waiting for ${waitTime} seconds.`);
+        // await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+      } else {
+        // 其他错误则抛出
+        throw error;
+      }
+    }
   }
 
   return itemList;

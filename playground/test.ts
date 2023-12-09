@@ -11,15 +11,52 @@ export async function test(from: string, to: string) {
     personalBaseToken: PERSONAL_BASE_TOKEN,
   });
 
-  //基准字段
-  type Row = {
-      table_a: string;
-      table_b: string;
-  };
+   await client.base.appTableRecord.batchUpdate({
+       path: {
+           table_id: "tblX4oyTPrF5UwAv",
+       },
 
-  let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
-  let standard_a: string[] = table_ab.map(row => row.table_a);
 
+
+     data: { records:[
+       {
+         fields: {
+           wechat: '文磊',
+           客户姓名: '甄文磊',
+           手机号码: '13700292882',
+           抖音: '胡子茬茬',
+           real_name: '甄文磊'
+         },
+         record_id: 'rec5K3ReVK'
+       },
+       {
+         fields: {
+           wechat: 'test',
+           客户姓名: '支昱然',
+           手机号码: '',
+           real_name: '高蓉'
+         },
+         record_id: 'recZctAdTF'
+       }
+     ]}
+       //data: modifiedItemList2,
+       //data: { records: modifiedItemList1 }
+       // data: {
+       //   records: [{
+       //     fields: {
+       //       wechat:"test"
+       //     },
+       //     record_id: 'rec5K3ReVK',
+       //   },{
+       //               fields: {
+       //                 wechat:"test"
+       //               },
+       //               record_id: 'recZctAdTF',
+       //             }],
+       // },
+
+    
+   });
 
 
 

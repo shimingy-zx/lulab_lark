@@ -36,7 +36,7 @@ app.get('/test', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  await sync("abc", "123");
+  await sync("abc", "123"); 
   res.send('hello world')
 });
 
