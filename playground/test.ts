@@ -61,14 +61,6 @@ export async function test(from: string, to: string) {
 
 
 
-
-
-
-
-
-
-  
-
   // let page_token = null;
   // let has_more = true;
 

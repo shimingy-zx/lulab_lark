@@ -1,9 +1,5 @@
-import client from './lark_client';
-import { fetchField, fetchTableRecord } from './lark_client';
-import { Field, ResponseData, getFieldType } from './fieldType';
-import { processData } from './interface';
-
-
+import { fetchField, fetchTableRecord, batchUpdate, batchCreate } from './lark_client';
+import { processData } from './convertDate';
 
 
 let TABLE_A_ID = "tblofVnOtmB3bkNz";
@@ -173,31 +169,13 @@ export async function sync(from: string, to: string) {
         console.log('>>> B表预备数据例子', update_2.slice(0, 2));
 
         // 第四步：使用 res2.ts 的函数处理数据
-        // const returnA = processData(update_1, fields_b);
-        // const returnB = processData(update_2, fields_b);
+        const returnA = processData(update_1, fields_b);
+        // console.log(returnA);
+        const returnB = processData(update_2, fields_b);
 
 
-
-        await client.base.appTableRecord.batchUpdate({
-            path: {
-                table_id: TABLE_B_ID,
-            },
-            //data: modifiedItemList2,
-            data: { records: update_1 }
-        });
-
-        console.log("同步完B表数据");
-
-
-
-
-        await client.base.appTableRecord.batchCreate({
-            path: {
-                table_id: TABLE_B_ID,
-            },
-            data: { records: update_2 }
-        });
-        console.log("数据增加到B表");
+        await batchUpdate(TABLE_B_ID, returnA);
+        await batchCreate(TABLE_B_ID, returnB);
 
 
         console.log("成功同步所有数据");

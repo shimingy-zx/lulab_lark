@@ -7,7 +7,7 @@ const app = express()
 const port = 3000
 
 
-app.get('/user_sync', async (req, res) => {
+app.get('/sync', async (req, res) => {
   await sync("abc", "123");
   res.send('Cron job scheduled!');
 });

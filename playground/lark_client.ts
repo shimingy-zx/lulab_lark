@@ -77,7 +77,7 @@ async function fetchField(table_id: string): Promise<FieldItem[]> {
           page_token: page_token // 使用page_token获取下一页数据
         },
         path: {
-          table_id,
+          table_id: table_id,
         },
       });
 
@@ -88,6 +88,8 @@ async function fetchField(table_id: string): Promise<FieldItem[]> {
 
 
     } catch (error) {
+      console.log('+++++错误===================');
+      console.log(error.response.status);
       console.log('+++++错误===================');
       if (error.response && error.response.status === 429) {
         // 当遇到429错误时等待
@@ -144,16 +146,41 @@ async function fetchTableRecord(combinedFields: string[], table_a_id: string): P
 
 
 
+async function batchUpdate(tableId: string, recordsToUpdate: any[]): Promise<void> {
+    try {
+        await client.base.appTableRecord.batchUpdate({
+            path: {
+                table_id: tableId,
+            },
+            data: { records: recordsToUpdate }
+        });
+        console.log("更新数据完成");
+    } catch (error) {
+        console.error("更新时发生错误:", error);
+    }
+}
 
 
-
+async function batchCreate(tableId: string, newRecords: any[]): Promise<void> {
+    try {
+        await client.base.appTableRecord.batchCreate({
+            path: {
+                table_id: tableId,
+            },
+            data: { records: newRecords }
+        });
+        console.log("创建数据完成");
+    } catch (error) {
+        console.error("创建时发生错误:", error);
+    }
+}
 
 
 
 
 export default client;
 // 导出函数以便在其他文件中使用
-export { fetchField, fetchTableRecord };
+export { fetchField, fetchTableRecord, batchUpdate, batchCreate };
 
 
 
