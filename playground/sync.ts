@@ -1,37 +1,27 @@
 import { fetchField, fetchTableRecord, batchUpdate, batchCreate } from './lark_client';
+import { Row, Field, Record } from './types'; // 确保路径正确
 import { processData } from './convertDate';
 
 
-let TABLE_A_ID = "tblofVnOtmB3bkNz";
-let TABLE_B_ID = "tblX4oyTPrF5UwAv";
-
 // //表ID
-// let TABLEID: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
+// let tableIds: Row[] = [
+//     { table_a: "tblofVnOtmB3bkNz", table_b: "tblX4oyTPrF5UwAv" }
+// ];
 
-interface Row {
-    table_a: string;
-    table_b: string;
-}
+// //基准字段
+// let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
 
-interface Field {
-    [key: string]: string | undefined; // Allows for any number of additional string properties
-}
-
-
-interface Record {
-    fields: Field;
-    id: string;
-    record_id: string;
-}
-
-//基准字段
-let table_ab: Row[] = [{ table_a: "客户姓名", table_b: "real_name" }];
-
-//同步字段
-let table_sync: Row[] = [{ table_a: "手机号码", table_b: "phone" }, { table_a: "wechat", table_b: "wechat" }, { table_a: "抖音", table_b: "抖音" }, { table_a: "家长职务", table_b: "职务" }];
+// //同步字段
+// let table_sync: Row[] = [
+//     { table_a: "手机号码", table_b: "phone" },
+//     { table_a: "wechat",  table_b: "wechat" },
+//     { table_a: "抖音",    table_b: "抖音" },
+//     { table_a: "家长职务", table_b: "职务" }
+// ];
 
 
-export async function sync(from: string, to: string) {
+
+export async function sync(tableIds: Row, table_ab: Row[], table_sync: Row[]) {
 
 
     let standard_a: string[] = table_ab.map(row => row.table_a);
@@ -41,38 +31,26 @@ export async function sync(from: string, to: string) {
     let combinedFields_a: string[] = [...standard_a, ...sync_a];
     let combinedFields_b: string[] = [...standard_b, ...sync_b];
     let combined_all = [...table_ab, ...table_sync];
+
+    let TABLE_A_ID = tableIds.table_a;
+    let TABLE_B_ID = tableIds.table_b;
+    
     console.log('>>> A表基准字段：', JSON.stringify(standard_a));
     console.log('>>> A表同步字段：', JSON.stringify(sync_a));
+    console.log('>>> B表基准字段：', JSON.stringify(standard_b));
+    console.log('>>> B表同步字段：', JSON.stringify(sync_b));
 
 
     //校验字段类型
-
     //获取A、B表所有字段
 
     const fields_a = await fetchField(TABLE_A_ID);
     const fields_b = await fetchField(TABLE_B_ID);
 
-    console.log('已获取到的表A字段列表');
-    console.log('已获取到的表B字段列表');
+    console.log('>>> 已获取到的表A字段列表');
+    console.log('>>> 已获取到的表B字段列表');
     // console.log('>>> Text fields', JSON.stringify(fields_a));
     // console.log('>>> Text fields', JSON.stringify(fields_b));
-
-
-
-    // Function to check and remove fields
-    // function filterData(records: Record[], criteria: TableAB[]): Record[] {
-    //     return records.filter(record => {
-    //         // Check for each criteria in table_ab
-    //         return criteria.every(({ table_a }) => {
-    //             // If the field exists and is not empty, keep the record
-    //             return record.fields[table_a] !== undefined && record.fields[table_a] !== '';
-    //         });
-    //     });
-    // }
-
-
-    // const fields_a = filterData(fields_a1, table_ab);
-
 
 
 
@@ -91,9 +69,7 @@ export async function sync(from: string, to: string) {
     // 进行比较
     compareTypes(fields_a, fields_b, table_ab);
     compareTypes(fields_a, fields_b, table_sync);
-    console.log('校验完成字段类型数据');
-
-
+    console.log('>>> 校验完成字段类型数据');
 
 
 
@@ -107,24 +83,36 @@ export async function sync(from: string, to: string) {
         // 使用返回的 itemList 进行后续操作
         console.log('>>> A表检索完成，A表检索数据例子', itemList_a.slice(0, 1));
         console.log('>>> B表检索完成，B表检索数据例子', itemList_b.slice(0, 1));
-        // console.log('>>> A表检索完成，A表检索数据例子', JSON.stringify(itemList_a.slice(0, 2)));
-        // console.log('>>> B表检索完成，B表检索数据例子', JSON.stringify(itemList_b.slice(0, 2)));
+
+
+        //删除空字段数据
+        const filterData = (data: Record[], standard: string[]): Record[] => {
+            return data.filter(row => {
+                return standard.every(field => {
+                    return row.fields[field] !== "" && row.fields[field] !== undefined;
+                });
+            });
+        };
+
+        const filteredRecords = filterData(itemList_a, standard_a);
+      
+
+        console.log(itemList_a.length);
+        console.log(filteredRecords.length);
+
+      
+
 
         // 移除itemList_a&fields_b 中 'fields' 的所有 'id' 字段
-        const A_List = itemList_a.map(({ id, ...rest }) => rest);
+        const A_List = filteredRecords.map(({ id, ...rest }) => rest);
         const B_List = itemList_b.map(({ id, ...rest }) => rest);
       
         console.log('>>> A表ID字段删除完成，数据例子', A_List.slice(0, 1));
         console.log('>>> B表ID字段删除完成，数据例子', B_List.slice(0, 1));
 
 
-        interface Record {
-            fields: { [key: string]: string };
-            record_id: string;
-        }
-
-
-        function syncFields(A: Record, combined_all: Row[]): Record {
+        // 替换AB表字段名称
+        function syncFields(A: Record_up, combined_all: Row[]): Record_up {
             let newFields: { [key: string]: string } = {};
 
             // 遍历A的fields，并使用combined_all中的映射关系来修改键
@@ -136,7 +124,6 @@ export async function sync(from: string, to: string) {
                     newFields[key] = A.fields[key];
                 }
             }
-
             return {
                 ...A,
                 fields: newFields
@@ -153,7 +140,6 @@ export async function sync(from: string, to: string) {
             const match = B_List.find((bItem: any) =>
                 table_ab.every(tab => aItem.fields[tab.table_a] === bItem.fields[tab.table_b])
             );
-
             if (match) {
                 aItem.record_id = match.record_id;
                 const replacedA = syncFields(aItem, combined_all);
@@ -168,12 +154,11 @@ export async function sync(from: string, to: string) {
         console.log('>>> A表预备数据例子', update_1.slice(0, 2));
         console.log('>>> B表预备数据例子', update_2.slice(0, 2));
 
-        // 第四步：使用 res2.ts 的函数处理数据
+        // 根据上传数据要求更改数据类型
         const returnA = processData(update_1, fields_b);
-        // console.log(returnA);
         const returnB = processData(update_2, fields_b);
 
-
+        // 上传和更新B表数据
         await batchUpdate(TABLE_B_ID, returnA);
         await batchCreate(TABLE_B_ID, returnB);
 
@@ -182,6 +167,7 @@ export async function sync(from: string, to: string) {
 
 
     } catch (error) {
+        console.log("获取AB表数据发生错误！！！！");
         console.error("发生错误:", error);
     }
 

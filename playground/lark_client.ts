@@ -89,7 +89,7 @@ async function fetchField(table_id: string): Promise<FieldItem[]> {
 
     } catch (error) {
       console.log('+++++错误===================');
-      console.log(error.response.status);
+     // console.log(error.response.status);
       console.log('+++++错误===================');
       if (error.response && error.response.status === 429) {
         // 当遇到429错误时等待

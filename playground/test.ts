@@ -2,7 +2,6 @@ import { BaseClient } from "@lark-base-open/node-sdk";
 
 const APP_TOKEN = process.env["APP_TOKEN"];
 const PERSONAL_BASE_TOKEN = process.env["PERSONAL_BASE_TOKEN"];
-const TABLEID = process.env["TABLE_ID"];
 
 export async function test(from: string, to: string) {
   // new BaseClient，fill appToken & personalBaseToken
@@ -90,26 +89,3 @@ console.log("start");
 
 
 
-//console.log('>>> Text fields', JSON.stringify(res2));
-//console.log(">>> Text fields", JSON.stringify(res.data.items));
-
-// console.log('>>> Text fields', JSON.stringify(res2.data.items));
-
-
-
-// Log the results for each name
-// console.log(`>>> Text fields for ${customer.fields.客户姓名}`, JSON.stringify(res2.data));
-
-//   await client.base.appTableRecord.update({
-//     path: {
-//       table_id: "tblX4oyTPrF5UwAv",
-//       record_id: res2.data.items[0].record_id,
-//     },
-//     data: {
-//       fields: {
-//         姓名_en: 'test1234',
-//         phone: customer.fields.手机号码
-//       }
-//     }
-//   });
-// }
