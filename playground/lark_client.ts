@@ -40,70 +40,70 @@ type ItemList = Item[];
 
 // 定义返回数据结构的接口
 interface FieldItem {
-  field_id: string;
-  field_name: string;
-  is_primary: boolean;
-  property: any;
-  type: number;
-  ui_type: string;
+    field_id: string;
+    field_name: string;
+    is_primary: boolean;
+    property: any;
+    type: number;
+    ui_type: string;
 }
 
 interface ResponseData {
-  has_more: boolean;
-  items: FieldItem[];
-  page_token: string;
-  total: number;
+    has_more: boolean;
+    items: FieldItem[];
+    page_token: string;
+    total: number;
 }
 
 interface ApiResponse {
-  code: number;
-  data: ResponseData;
-  msg: string;
+    code: number;
+    data: ResponseData;
+    msg: string;
 }
 
 
 
 async function fetchField(table_id: string): Promise<FieldItem[]> {
 
-  let page_token = null;
-  let has_more = true;
-  let itemList: FieldItem[] = [];
+    let page_token = null;
+    let has_more = true;
+    let itemList: FieldItem[] = [];
 
-  while (has_more) {
-    try {
-      const resA: ApiResponse = await client.base.appTableField.list({
-        params: {
-          page_size: 100,
-          page_token: page_token // 使用page_token获取下一页数据
-        },
-        path: {
-          table_id: table_id,
-        },
-      });
+    while (has_more) {
+        try {
+            const resA: ApiResponse = await client.base.appTableField.list({
+                params: {
+                    page_size: 100,
+                    page_token: page_token // 使用page_token获取下一页数据
+                },
+                path: {
+                    table_id: table_id,
+                },
+            });
 
-      // 合并当前页的项目到itemList
-      itemList = itemList.concat(resA.data.items);
-      has_more = resA.data.has_more;
-      page_token = resA.data.page_token;
+            // 合并当前页的项目到itemList
+            itemList = itemList.concat(resA.data.items);
+            has_more = resA.data.has_more;
+            page_token = resA.data.page_token;
 
 
-    } catch (error) {
-      console.log('+++++错误===================');
-     // console.log(error.response.status);
-      console.log('+++++错误===================');
-      if (error.response && error.response.status === 429) {
-        // 当遇到429错误时等待
-        const waitTime = error.response.headers['x-ogw-ratelimit-reset'] || 60;
-        console.log(`Rate limit reached. Waiting for ${waitTime} seconds.`);
-        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
-      } else {
-        // 其他错误则抛出
-        throw error;
-      }
+        } catch (error) {
+            console.log('+++++错误===================');
+            // console.log(error.response.status);
+            console.log('+++++错误===================');
+            if (error.response && error.response.status === 429) {
+                // 当遇到429错误时等待
+                const waitTime = error.response.headers['x-ogw-ratelimit-reset'] || 60;
+                console.log(`Rate limit reached. Waiting for ${waitTime} seconds.`);
+                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+            } else {
+                // 其他错误则抛出
+                throw error;
+            }
+        }
     }
-  }
 
-  return itemList;
+    return itemList;
 }
 
 
@@ -121,25 +121,47 @@ async function fetchTableRecord(combinedFields: string[], table_a_id: string): P
     let page_token = null;
     let has_more = true;
     let itemList: ItemList = [];
+    console.log(`>>> 开始请求${table_a_id}数据`);
 
     while (has_more) {
-        const res = await client.base.appTableRecord.list({
-            params: {
-                page_size: 400,
-                field_names: JSON.stringify(combinedFields),
-                page_token: page_token,
-            },
-            path: {
-                table_id: table_a_id,
-            },
-        });
+        try {
+            const res = await client.base.appTableRecord.list({
+                params: {
+                    page_size: 400,
+                    field_names: JSON.stringify(combinedFields),
+                    page_token: page_token,
+                },
+                path: {
+                    table_id: table_a_id,
+                },
+            });
 
-        itemList = itemList.concat(res.data.items);
+            itemList = itemList.concat(res.data.items);
+            console.log(`>>> 已获取表${table_a_id}数据个数：`, itemList.length);
 
-        // 更新循环条件
-        has_more = res.data.has_more;
-        page_token = res.data.page_token;
+            // 更新循环条件
+            has_more = res.data.has_more;
+            page_token = res.data.page_token;
+
+
+        } catch (error) {
+            console.log('+++++错误===================');
+            console.log(error.response);
+            console.log('+++++错误===================');
+            if (error.response && error.response.status === 429) {
+                // 当遇到429错误时等待
+                const waitTime = error.response.headers['x-ogw-ratelimit-reset'] || 60;
+                console.log(`Rate limit reached. Waiting for ${waitTime} seconds.`);
+                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+            } else {
+                // 其他错误则抛出
+                throw error;
+            }
+        }
+
     }
+
+    console.log(`>>> 累计获取表${table_a_id}数据个数：`, itemList.length);
 
     return itemList;
 }
@@ -181,8 +203,5 @@ async function batchCreate(tableId: string, newRecords: any[]): Promise<void> {
 export default client;
 // 导出函数以便在其他文件中使用
 export { fetchField, fetchTableRecord, batchUpdate, batchCreate };
-
-
-
 
 

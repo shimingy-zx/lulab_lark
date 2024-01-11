@@ -27,6 +27,9 @@ export function processData(data: any[], fieldTypeMap: Map<string, number>): any
                     break;
                 case 15:
                     break;
+                case 21:
+                    fields[fieldName]=[item.record_id]
+                    break;
                 case 1003:
                     fields[fieldName] = fields[fieldName].map(({ en_name, email, name, ...rest }) => rest);
                     break;
