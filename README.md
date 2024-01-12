@@ -8,3 +8,10 @@ Includes a simple test suite using Mocha and Chai.
 
 License
 This project is licensed under the MIT License. See the LICENSE file for more information.
+
+
+## 设置环境变量
+
+export PERSONAL_BASE_TOKEN=value
+
+export APP_TOKEN=value
